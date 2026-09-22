@@ -1,892 +1,305 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Suite All-in-One - Complete Client-Side PDF Tools</title>
+  <title>PDF & Photo Suite Pro</title>
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts: Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- PDF Libraries (pdf-lib, pdf.js, jsPDF) -->
-  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <!-- Load External Libraries via Reliable CDNs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-            },
-            accent: {
-              cyan: '#06b6d4',
-              purple: '#a855f7',
-              rose: '#f43f5e',
-            },
-            dark: {
-              bg: '#0b0f19',
-              card: '#151e2e',
-              border: '#233148',
-              hover: '#1e2b40'
-            }
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent-color: #f43f5e;
+      --accent-hover: #e11d48;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
     }
-    ::-webkit-scrollbar-track {
-      background: #0b0f19;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #233148;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #334155;
-    }
-    .file-drop-zone {
-      background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%23334155FF' stroke-width='2' stroke-dasharray='8%2c 8' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
-    }
-    .file-drop-zone.active {
-      background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%236366F1FF' stroke-width='3' stroke-dasharray='8%2c 8' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
-      background-color: rgba(99, 102, 241, 0.08);
-    }
-    .glass-glow {
-      box-shadow: 0 0 35px -5px rgba(99, 102, 241, 0.15);
-    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; padding: 20px; }
+    
+    header { text-align: center; margin-bottom: 30px; }
+    header h1 { color: var(--accent-color); font-size: 2.2rem; margin-bottom: 8px; }
+    header p { color: var(--text-muted); }
+
+    .container { max-width: 1000px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); }
+    
+    .nav-tabs { display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px; }
+    .tab-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 600; }
+    .tab-btn.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .drop-zone { border: 2px dashed var(--border-color); padding: 30px; text-align: center; border-radius: 8px; cursor: pointer; margin-bottom: 15px; background: rgba(255,255,255,0.02); }
+    .drop-zone:hover { border-color: var(--accent-color); background: rgba(244,63,94,0.05); }
+
+    .control-group { margin-bottom: 15px; }
+    label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px; }
+    input, select, button { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: #0f172a; color: white; }
+    
+    .btn-action { background: var(--accent-color); border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    .btn-action:hover { background: var(--accent-hover); }
+
+    .status-box { margin-top: 15px; padding: 10px; text-align: center; border-radius: 6px; font-weight: bold; }
+    
+    /* Photo Editor Specifics */
+    .editor-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    @media (max-width: 768px) { .editor-layout { grid-template-columns: 1fr; } }
+    .canvas-container { text-align: center; background: #0f172a; padding: 10px; border-radius: 8px; overflow: hidden; }
+    canvas { max-width: 100%; max-height: 400px; border-radius: 4px; }
   </style>
 </head>
-<body class="bg-dark-bg text-slate-200 font-sans flex flex-col min-h-screen antialiased selection:bg-brand-500 selection:text-white">
+<body>
 
-  <header class="bg-dark-card/90 backdrop-blur-md border-b border-dark-border sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="showDashboard()">
-        <div class="w-10 h-10 bg-gradient-to-tr from-brand-600 via-accent-purple to-accent-cyan rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-brand-500/20">
-          <i class="fa-solid fa-layer-group"></i>
-        </div>
-        <span class="text-2xl font-extrabold text-white tracking-tight">PDF<span class="text-brand-400">Suite</span></span>
-      </div>
-
-      <div class="flex items-center space-x-3">
-        <button onclick="showDashboard()" class="text-xs bg-dark-hover hover:bg-slate-800 text-slate-300 font-semibold py-2 px-3.5 rounded-lg border border-dark-border transition flex items-center gap-1.5">
-          <i class="fa-solid fa-grid-2"></i> All Tools
-        </button>
-        <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> 100% Client-Side
-        </span>
-      </div>
-    </div>
+  <header>
+    <h1>PDF & Photo Suite</h1>
+    <p>Semua pemrosesan dilakukan di browser Anda (Aman & Privat)</p>
   </header>
 
-  <main id="dashboardView" class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <div class="text-center max-w-3xl mx-auto mb-12">
-      <h1 class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
-        All-in-One <span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-400 via-accent-purple to-accent-cyan">PDF Toolkit</span>
-      </h1>
-      <p class="text-slate-400 text-base sm:text-lg">
-        Fast, private, browser-based PDF processing. Your files never leave your device.
-      </p>
+  <div class="container">
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="setTab('compress')">📉 Kompres PDF</button>
+      <button class="tab-btn" onclick="setTab('merge')">🧩 Gabung PDF</button>
+      <button class="tab-btn" onclick="setTab('split')">✂️ Pisah PDF</button>
+      <button class="tab-btn" onclick="setTab('photo')">🖼️ Edit Foto</button>
     </div>
 
-    <!-- 11 Tools Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+    <!-- COMPRESS PDF -->
+    <div id="tab-compress" class="tab-content active">
+      <div class="drop-zone" onclick="document.getElementById('compressFile').click()">
+        📄 Pilih File PDF
+        <input type="file" id="compressFile" accept="application/pdf" style="display:none;" onchange="showName(this, 'compressInfo')">
+      </div>
+      <p id="compressInfo" style="margin-bottom: 10px; font-size: 0.9rem; color: var(--accent-color);"></p>
       
-      <!-- 1. Compress -->
-      <div onclick="openTool('compress')" class="group bg-dark-card p-5 rounded-2xl border border-dark-border hover:border-brand-500/60 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
-        <div>
-          <div class="w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-xl flex items-center justify-center text-xl mb-4 border border-indigo-500/20 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-file-compress"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-brand-400 transition-colors">Compress PDF</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Optimize and reduce PDF file size with customizable quality settings.</p>
-        </div>
-        <div class="mt-5 text-xs font-semibold text-brand-400 flex items-center gap-1">
-          Compress <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-        </div>
+      <div class="control-group">
+        <label>Kualitas Kompresi:</label>
+        <select id="compressQuality">
+          <option value="0.4">Tinggi (Ukuran Lebih Kecil)</option>
+          <option value="0.6" selected>Sedang (Rekomendasi)</option>
+          <option value="0.8">Rendah (Kualitas Lebih Bagus)</option>
+        </select>
       </div>
-
-      <!-- 2. Merge -->
-      <div onclick="openTool('merge')" class="group bg-dark-card p-5 rounded-2xl border border-dark-border hover:border-brand-500/60 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
-        <div>
-          <div class="w-12 h-12 bg-purple-500/10 text-purple-400 rounded-xl flex items-center justify-center text-xl mb-4 border border-purple-500/20 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-object-group"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-brand-400 transition-colors">Merge PDF</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Combine multiple PDF documents into one seamless file.</p>
-        </div>
-        <div class="mt-5 text-xs font-semibold text-brand-400 flex items-center gap-1">
-          Merge <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-        </div>
-      </div>
-
-      <!-- 3. Split -->
-      <div onclick="openTool('split')" class="group bg-dark-card p-5 rounded-2xl border border-dark-border hover:border-brand-500/60 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
-        <div>
-          <div class="w-12 h-12 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center text-xl mb-4 border border-amber-500/20 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-scissors"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-brand-400 transition-colors">Split PDF</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Extract specified page ranges or individual pages into a new PDF.</p>
-        </div>
-        <div class="mt-5 text-xs font-semibold text-brand-400 flex items-center gap-1">
-          Split <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-        </div>
-      </div>
-
-      <!-- 4. Watermark -->
-      <div onclick="openTool('watermark')" class="group bg-dark-card p-5 rounded-2xl border border-dark-border hover:border-brand-500/60 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
-        <div>
-          <div class="w-12 h-12 bg-cyan-500/10 text-cyan-400 rounded-xl flex items-center justify-center text-xl mb-4 border border-cyan-500/20 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-stamp"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-brand-400 transition-colors">Watermark PDF</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Add custom overlay text with angle, opacity, and font control.</p>
-        </div>
-        <div class="mt-5 text-xs font-semibold text-brand-400 flex items-center gap-1">
-          Watermark <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-        </div>
-      </div>
-
-      <!-- 5. Page Numbers -->
-      <div onclick="openTool('pagenumber')" class="group bg-dark-card p-5 rounded-2xl border border-dark-border hover:border-brand-500/60 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
-        <div>
-          <div class="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center text-xl mb-4 border border-emerald-500/20 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-list-ol"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-brand-400 transition-colors">Page Numbers</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Stamp dynamic page numbers at top or bottom positions.</p>
-        </div>
-        <div class="mt-5 text-xs font-semibold text-brand-400 flex items-center gap-1">
-          Add Numbers <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-        </div>
-      </div>
-
-      <!-- 6. Rotate -->
-      <div onclick="openTool('rotate')" class="group bg-dark-card p-5 rounded-2xl border border-dark-border hover:border-brand-500/60 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
-        <div>
-          <div class="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-xl flex items-center justify-center text-xl mb-4 border border-blue-500/20 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-rotate-right"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-brand-400 transition-colors">Rotate PDF</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Rotate pages clockwise or counterclockwise by 90°, 180°, or 270°.</p>
-        </div>
-        <div class="mt-5 text-xs font-semibold text-brand-400 flex items-center gap-1">
-          Rotate <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-        </div>
-      </div>
-
-      <!-- 7. Delete Pages -->
-      <div onclick="openTool('delete')" class="group bg-dark-card p-5 rounded-2xl border border-dark-border hover:border-brand-500/60 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
-        <div>
-          <div class="w-12 h-12 bg-rose-500/10 text-rose-400 rounded-xl flex items-center justify-center text-xl mb-4 border border-rose-500/20 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-trash-can"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-brand-400 transition-colors">Delete Pages</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Remove unwanted pages from your document cleanly.</p>
-        </div>
-        <div class="mt-5 text-xs font-semibold text-brand-400 flex items-center gap-1">
-          Delete <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-        </div>
-      </div>
-
-      <!-- 8. Protect PDF -->
-      <div onclick="openTool('protect')" class="group bg-dark-card p-5 rounded-2xl border border-dark-border hover:border-brand-500/60 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
-        <div>
-          <div class="w-12 h-12 bg-red-500/10 text-red-400 rounded-xl flex items-center justify-center text-xl mb-4 border border-red-500/20 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-lock"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-brand-400 transition-colors">Protect PDF</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Encrypt your PDF document with a custom user password.</p>
-        </div>
-        <div class="mt-5 text-xs font-semibold text-brand-400 flex items-center gap-1">
-          Protect <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-        </div>
-      </div>
-
-      <!-- 9. Extract Text -->
-      <div onclick="openTool('extracttext')" class="group bg-dark-card p-5 rounded-2xl border border-dark-border hover:border-brand-500/60 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
-        <div>
-          <div class="w-12 h-12 bg-teal-500/10 text-teal-400 rounded-xl flex items-center justify-center text-xl mb-4 border border-teal-500/20 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-file-lines"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-brand-400 transition-colors">Extract Text</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Parse and extract plain readable text content out of PDF files.</p>
-        </div>
-        <div class="mt-5 text-xs font-semibold text-brand-400 flex items-center gap-1">
-          Extract <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-        </div>
-      </div>
-
-      <!-- 10. PDF to Image -->
-      <div onclick="openTool('pdf-to-img')" class="group bg-dark-card p-5 rounded-2xl border border-dark-border hover:border-brand-500/60 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
-        <div>
-          <div class="w-12 h-12 bg-pink-500/10 text-pink-400 rounded-xl flex items-center justify-center text-xl mb-4 border border-pink-500/20 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-image"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-brand-400 transition-colors">PDF to Image</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Convert pages into high-resolution PNG or JPG image formats.</p>
-        </div>
-        <div class="mt-5 text-xs font-semibold text-brand-400 flex items-center gap-1">
-          Convert <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-        </div>
-      </div>
-
-      <!-- 11. Image to PDF -->
-      <div onclick="openTool('img-to-pdf')" class="group bg-dark-card p-5 rounded-2xl border border-dark-border hover:border-brand-500/60 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
-        <div>
-          <div class="w-12 h-12 bg-violet-500/10 text-violet-400 rounded-xl flex items-center justify-center text-xl mb-4 border border-violet-500/20 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-images"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-brand-400 transition-colors">Image to PDF</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Convert JPG/PNG image files into a single unified PDF document.</p>
-        </div>
-        <div class="mt-5 text-xs font-semibold text-brand-400 flex items-center gap-1">
-          Convert <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-        </div>
-      </div>
-
-      <!-- 12. Photo Editor -->
-      <div onclick="openTool('photo-editor')" class="group bg-dark-card p-5 rounded-2xl border border-dark-border hover:border-brand-500/60 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
-        <div>
-          <div class="w-12 h-12 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center text-xl mb-4 border border-amber-500/20 group-hover:scale-110 transition-transform">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-1.5 group-hover:text-brand-400 transition-colors">Photo Editor</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Adjust brightness, contrast, color filters, rotate, and flip photos.</p>
-        </div>
-        <div class="mt-5 text-xs font-semibold text-brand-400 flex items-center gap-1">
-          Edit Photo <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-        </div>
-      </div>
-
+      <button class="btn-action" onclick="processCompress()">Kompres & Unduh</button>
+      <div id="compressStatus" class="status-box"></div>
     </div>
-  </main>
 
-  <div id="resultModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-dark-card border border-dark-border rounded-3xl max-w-lg w-full p-8 text-center shadow-2xl">
-      <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 border border-emerald-500/20">
-        <i class="fa-solid fa-check"></i>
+    <!-- MERGE PDF -->
+    <div id="tab-merge" class="tab-content">
+      <div class="drop-zone" onclick="document.getElementById('mergeFiles').click()">
+        📄 Pilih Beberapa PDF (Minimal 2)
+        <input type="file" id="mergeFiles" accept="application/pdf" multiple style="display:none;" onchange="showName(this, 'mergeInfo')">
       </div>
-      <h3 class="text-2xl font-extrabold text-white mb-2">Success!</h3>
-      <p class="text-slate-400 text-sm mb-6" id="resultDescription">Your document has been processed.</p>
+      <p id="mergeInfo" style="margin-bottom: 10px; font-size: 0.9rem; color: var(--accent-color);"></p>
+      <button class="btn-action" onclick="processMerge()">Gabungkan PDF</button>
+      <div id="mergeStatus" class="status-box"></div>
+    </div>
+
+    <!-- SPLIT PDF -->
+    <div id="tab-split" class="tab-content">
+      <div class="drop-zone" onclick="document.getElementById('splitFile').click()">
+        📄 Pilih File PDF
+        <input type="file" id="splitFile" accept="application/pdf" style="display:none;" onchange="showName(this, 'splitInfo')">
+      </div>
+      <p id="splitInfo" style="margin-bottom: 10px; font-size: 0.9rem; color: var(--accent-color);"></p>
+      <div class="control-group">
+        <label>Rentang Halaman (Contoh: 1-3 atau 2):</label>
+        <input type="text" id="splitRange" placeholder="e.g. 1-3">
+      </div>
+      <button class="btn-action" onclick="processSplit()">Pisahkan PDF</button>
+      <div id="splitStatus" class="status-box"></div>
+    </div>
+
+    <!-- PHOTO EDITOR -->
+    <div id="tab-photo" class="tab-content">
+      <div class="drop-zone" onclick="document.getElementById('photoFile').click()">
+        📷 Pilih Gambar / Foto (JPG, PNG)
+        <input type="file" id="photoFile" accept="image/*" style="display:none;" onchange="loadPhoto(event)">
+      </div>
       
-      <div id="extractedTextContainer" class="hidden text-left mb-6">
-        <textarea id="extractedTextArea" readonly class="w-full h-48 bg-dark-bg border border-dark-border text-slate-200 rounded-xl p-3 text-xs font-mono resize-none focus:outline-none"></textarea>
-      </div>
-
-      <div class="space-y-3">
-        <button id="downloadBtn" class="w-full bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-brand-500/25 transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-download"></i> Download Output
-        </button>
-        <button onclick="closeResultModal()" class="w-full bg-dark-hover hover:bg-slate-800 text-slate-300 font-semibold py-3 px-6 rounded-xl border border-dark-border transition">
-          Close
-        </button>
+      <div class="editor-layout">
+        <div class="canvas-container">
+          <canvas id="photoCanvas"></canvas>
+        </div>
+        <div>
+          <div class="control-group">
+            <label>Kecerahan (Brightness):</label>
+            <input type="range" id="bright" min="50" max="150" value="100" oninput="applyFilters()">
+          </div>
+          <div class="control-group">
+            <label>Kontras (Contrast):</label>
+            <input type="range" id="contrast" min="50" max="150" value="100" oninput="applyFilters()">
+          </div>
+          <div class="control-group">
+            <label>Efek Filter:</label>
+            <select id="filterSelect" onchange="applyFilters()">
+              <option value="none">Normal</option>
+              <option value="grayscale(100%)">Hitam Putih</option>
+              <option value="sepia(100%)">Sepia</option>
+              <option value="invert(100%)">Invert Warna</option>
+            </select>
+          </div>
+          <button class="btn-action" onclick="downloadPhoto()">Unduh Foto Hasil Edit</button>
+        </div>
       </div>
     </div>
+
   </div>
 
-  <footer class="bg-dark-card border-t border-dark-border mt-auto py-6">
-    <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 text-sm">
-      <p>&copy; PDF Suite All-in-One. Secure client-side processing.</p>
-    </div>
-  </footer>
-
   <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
-    let currentTool = 'compress';
-    let loadedFiles = [];
-
-    const toolConfigs = {
-      'compress': { title: 'Compress PDF', accept: '.pdf', icon: 'fa-file-compress', heading: 'Select PDF to compress', btnText: 'Compress PDF' },
-      'merge': { title: 'Merge PDFs', accept: '.pdf', icon: 'fa-object-group', heading: 'Select PDF files to merge', btnText: 'Merge PDFs' },
-      'split': { title: 'Split PDF', accept: '.pdf', icon: 'fa-scissors', heading: 'Select PDF to split', btnText: 'Split PDF' },
-      'watermark': { title: 'Watermark PDF', accept: '.pdf', icon: 'fa-stamp', heading: 'Select PDF to add watermark', btnText: 'Apply Watermark' },
-      'pagenumber': { title: 'Page Numbers', accept: '.pdf', icon: 'fa-list-ol', heading: 'Select PDF for numbering', btnText: 'Add Page Numbers' },
-      'rotate': { title: 'Rotate PDF', accept: '.pdf', icon: 'fa-rotate-right', heading: 'Select PDF to rotate', btnText: 'Rotate Pages' },
-      'delete': { title: 'Delete Pages', accept: '.pdf', icon: 'fa-trash-can', heading: 'Select PDF to delete pages', btnText: 'Delete Pages' },
-      'protect': { title: 'Protect PDF', accept: '.pdf', icon: 'fa-lock', heading: 'Select PDF to encrypt', btnText: 'Protect PDF' },
-      'extracttext': { title: 'Extract Text', accept: '.pdf', icon: 'fa-file-lines', heading: 'Select PDF to extract text', btnText: 'Extract Text' },
-      'pdf-to-img': { title: 'PDF to Image', accept: '.pdf', icon: 'fa-image', heading: 'Select PDF to convert', btnText: 'Convert to Image' },
-      'img-to-pdf': { title: 'Image to PDF', accept: 'image/jpeg, image/png', icon: 'fa-images', heading: 'Select JPG/PNG images', btnText: 'Convert to PDF' },
-      'photo-editor': { title: 'Photo Editor', accept: 'image/jpeg, image/png, image/webp', icon: 'fa-wand-magic-sparkles', heading: 'Select Photo to Edit', btnText: 'Export Edited Photo' }
-    };
-
-    // Drag and Drop Zone Handling
-    const dropZone = document.getElementById('dropZone');
-    ['dragenter', 'dragover'].forEach(name => dropZone.addEventListener(name, (e) => { e.preventDefault(); dropZone.classList.add('active'); }));
-    ['dragleave', 'drop'].forEach(name => dropZone.addEventListener(name, (e) => { e.preventDefault(); dropZone.classList.remove('active'); }));
-    dropZone.addEventListener('drop', (e) => handleFiles(Array.from(e.dataTransfer.files)));
-
-    function triggerFileInput() {
-      const input = document.getElementById('fileInput');
-      input.accept = toolConfigs[currentTool].accept;
-      input.click();
+    // Set PDF.js Worker secara aman
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
     }
 
-    function handleFileSelect(e) {
-      handleFiles(Array.from(e.target.files));
-      e.target.value = '';
+    function setTab(name) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      event.target.classList.add('active');
     }
 
-    function showDashboard() {
-      document.getElementById('dashboardView').classList.remove('hidden');
-      document.getElementById('toolWorkspaceView').classList.add('hidden');
-      clearFiles();
-    }
-
-    function openTool(toolKey) {
-      currentTool = toolKey;
-      const config = toolConfigs[toolKey];
-      document.getElementById('toolTitle').textContent = config.title;
-      document.getElementById('uploadHeading').textContent = config.heading;
-      document.getElementById('toolIcon').className = `fa-solid ${config.icon}`;
-      document.getElementById('actionButtonText').textContent = config.btnText;
-
-      document.getElementById('dashboardView').classList.add('hidden');
-      document.getElementById('toolWorkspaceView').classList.remove('hidden');
-
-      clearFiles();
-      renderOptionsSidebar();
-    }
-
-    function clearFiles() {
-      loadedFiles = [];
-      document.getElementById('uploadContainer').classList.remove('hidden');
-      document.getElementById('editorContainer').classList.add('hidden');
-      document.getElementById('fileList').innerHTML = '';
-      document.getElementById('fileCount').textContent = '0';
-    }
-
-    async function handleFiles(files) {
-      if (!files.length) return;
-      const isImgTool = currentTool === 'img-to-pdf' || currentTool === 'photo-editor';
-      const validFiles = files.filter(f => isImgTool ? f.type.startsWith('image/') : f.type === 'application/pdf' || f.name.endsWith('.pdf'));
-
-      if (!validFiles.length) return alert('Unsupported file type!');
-
-      if (['compress', 'split', 'watermark', 'pagenumber', 'rotate', 'delete', 'protect', 'extracttext', 'pdf-to-img', 'photo-editor'].includes(currentTool)) {
-        loadedFiles = [];
-      }
-
-      for (const file of validFiles) {
-        const item = { id: Math.random().toString(36).substring(2, 9), file, name: file.name, pagesCount: 1 };
-        if (file.type === 'application/pdf') {
-          try {
-            const buf = await file.arrayBuffer();
-            const doc = await PDFLib.PDFDocument.load(buf, { ignoreEncryption: true });
-            item.pagesCount = doc.getPageCount();
-          } catch (e) {}
-        }
-        loadedFiles.push(item);
-      }
-      updateFilesUI();
-    }
-
-    function updateFilesUI() {
-      if (!loadedFiles.length) return clearFiles();
-      document.getElementById('uploadContainer').classList.add('hidden');
-      document.getElementById('editorContainer').classList.remove('hidden');
-      document.getElementById('fileCount').textContent = loadedFiles.length;
-
-      const list = document.getElementById('fileList');
-      list.innerHTML = '';
-
-      loadedFiles.forEach(item => {
-        const isPdf = item.file.type === 'application/pdf';
-        const row = document.createElement('div');
-        row.className = 'flex items-center justify-between p-3.5 bg-dark-bg border border-dark-border rounded-xl';
-        row.innerHTML = `
-          <div class="flex items-center space-x-3 overflow-hidden">
-            <div class="w-10 h-10 rounded-lg bg-dark-card border border-dark-border flex items-center justify-center text-lg shrink-0">
-              <i class="fa-solid ${isPdf ? 'fa-file-pdf text-brand-400' : 'fa-file-image text-emerald-400'}"></i>
-            </div>
-            <div class="truncate">
-              <p class="text-sm font-bold text-white truncate">${item.name}</p>
-              <p class="text-xs text-slate-500">${(item.file.size / 1024 / 1024).toFixed(2)} MB ${isPdf ? `• ${item.pagesCount} Pages` : ''}</p>
-            </div>
-          </div>
-          <button onclick="removeFile('${item.id}')" class="p-2 text-rose-400 hover:bg-rose-500/10 rounded-lg transition">
-            <i class="fa-solid fa-trash-can text-sm"></i>
-          </button>
-        `;
-        list.appendChild(row);
-      });
-      renderOptionsSidebar();
-    }
-
-    function removeFile(id) {
-      loadedFiles = loadedFiles.filter(f => f.id !== id);
-      updateFilesUI();
-    }
-
-    function renderOptionsSidebar() {
-      const container = document.getElementById('dynamicOptions');
-      container.innerHTML = '';
-      const totalPages = loadedFiles[0] ? loadedFiles[0].pagesCount : 1;
-
-      if (currentTool === 'compress') {
-        container.innerHTML = `
-          <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Quality Level</label>
-          <select id="optQuality" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-3 text-sm focus:border-brand-500 outline-none">
-            <option value="0.3">High Compression (Lower quality)</option>
-            <option value="0.5" selected>Medium (Recommended)</option>
-            <option value="0.75">Low Compression (Best quality)</option>
-          </select>`;
-      } else if (currentTool === 'split') {
-        container.innerHTML = `
-          <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Split Range (Total: ${totalPages})</label>
-          <input type="text" id="optRange" value="1-${Math.min(totalPages, 2)}" placeholder="e.g. 1-3, 5" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-3 text-sm focus:border-brand-500 outline-none">`;
-      } else if (currentTool === 'watermark') {
-        container.innerHTML = `
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Watermark Text</label>
-              <input type="text" id="optWatermarkText" value="CONFIDENTIAL" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-2.5 text-sm outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Opacity (0.1 - 1.0)</label>
-              <input type="number" id="optOpacity" value="0.3" min="0.1" max="1" step="0.1" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-2.5 text-sm outline-none">
-            </div>
-          </div>`;
-      } else if (currentTool === 'pagenumber') {
-        container.innerHTML = `
-          <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Position</label>
-          <select id="optPosition" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-3 text-sm outline-none">
-            <option value="bottom-center">Bottom Center</option>
-            <option value="bottom-right">Bottom Right</option>
-            <option value="top-center">Top Center</option>
-          </select>`;
-      } else if (currentTool === 'rotate') {
-        container.innerHTML = `
-          <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Rotation Angle</label>
-          <select id="optAngle" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-3 text-sm outline-none">
-            <option value="90">90° Clockwise</option>
-            <option value="180">180° Flip</option>
-            <option value="270">270° Counter-Clockwise</option>
-          </select>`;
-      } else if (currentTool === 'delete') {
-        container.innerHTML = `
-          <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Pages to Delete (Total: ${totalPages})</label>
-          <input type="text" id="optDeletePages" placeholder="e.g. 1, 3" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-3 text-sm outline-none">`;
-      } else if (currentTool === 'protect') {
-        container.innerHTML = `
-          <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Set Password</label>
-          <input type="password" id="optPassword" placeholder="Enter password" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-3 text-sm outline-none">`;
-      } else if (currentTool === 'pdf-to-img') {
-        container.innerHTML = `
-          <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Image Format</label>
-          <select id="optImgFormat" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-3 text-sm outline-none">
-            <option value="image/png">PNG</option>
-            <option value="image/jpeg">JPEG</option>
-          </select>`;
-      } else if (currentTool === 'photo-editor') {
-        container.innerHTML = `
-          <div class="space-y-3 text-xs">
-            <div>
-              <div class="flex justify-between text-slate-400 font-semibold mb-1">
-                <span>Brightness</span>
-                <span id="lblBrightness">100%</span>
-              </div>
-              <input type="range" id="optBrightness" min="0" max="200" value="100" class="w-full accent-brand-500" oninput="document.getElementById('lblBrightness').innerText=this.value+'%'">
-            </div>
-            <div>
-              <div class="flex justify-between text-slate-400 font-semibold mb-1">
-                <span>Contrast</span>
-                <span id="lblContrast">100%</span>
-              </div>
-              <input type="range" id="optContrast" min="0" max="200" value="100" class="w-full accent-brand-500" oninput="document.getElementById('lblContrast').innerText=this.value+'%'">
-            </div>
-            <div>
-              <label class="block font-bold text-slate-400 mb-1">Color Filter</label>
-              <select id="optFilter" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-2.5 text-xs outline-none">
-                <option value="none">Normal</option>
-                <option value="grayscale">Grayscale (B/W)</option>
-                <option value="sepia">Sepia</option>
-                <option value="invert">Invert Colors</option>
-              </select>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block font-bold text-slate-400 mb-1">Rotate</label>
-                <select id="optPhotoRotate" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-2.5 text-xs outline-none">
-                  <option value="0">0°</option>
-                  <option value="90">90° CW</option>
-                  <option value="180">180°</option>
-                  <option value="270">270° CCW</option>
-                </select>
-              </div>
-              <div>
-                <label class="block font-bold text-slate-400 mb-1">Flip</label>
-                <select id="optPhotoFlip" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-2.5 text-xs outline-none">
-                  <option value="none">None</option>
-                  <option value="horizontal">Horizontal</option>
-                  <option value="vertical">Vertical</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label class="block font-bold text-slate-400 mb-1">Output Format</label>
-              <select id="optExportFormat" class="w-full bg-dark-bg border border-dark-border text-white rounded-xl p-2.5 text-xs outline-none">
-                <option value="image/png">PNG</option>
-                <option value="image/jpeg">JPEG</option>
-                <option value="image/webp">WEBP</option>
-              </select>
-            </div>
-          </div>`;
+    function showName(input, targetId) {
+      if(input.files.length > 0) {
+        const names = Array.from(input.files).map(f => f.name).join(', ');
+        document.getElementById(targetId).innerText = 'Terpilih: ' + names;
       }
     }
 
-    function updateProgress(percent, text) {
-      document.getElementById('progressContainer').classList.remove('hidden');
-      document.getElementById('progressBar').style.width = `${percent}%`;
-      document.getElementById('progressPercent').textContent = `${Math.round(percent)}%`;
-      if (text) document.getElementById('progressText').textContent = text;
-    }
+    /* COMPRESS */
+    async function processCompress() {
+      const file = document.getElementById('compressFile').files[0];
+      const status = document.getElementById('compressStatus');
+      const q = parseFloat(document.getElementById('compressQuality').value);
+      if(!file) return alert('Pilih file PDF dahulu!');
 
-    async function processAction() {
-      if (!loadedFiles.length) return;
-      const btn = document.getElementById('actionButton');
-      btn.disabled = true;
-
+      status.innerText = 'Mengompres PDF...';
       try {
-        if (currentTool === 'compress') await executeCompress();
-        else if (currentTool === 'merge') await executeMerge();
-        else if (currentTool === 'split') await executeSplit();
-        else if (currentTool === 'watermark') await executeWatermark();
-        else if (currentTool === 'pagenumber') await executePageNumber();
-        else if (currentTool === 'rotate') await executeRotate();
-        else if (currentTool === 'delete') await executeDeletePages();
-        else if (currentTool === 'protect') await executeProtect();
-        else if (currentTool === 'extracttext') await executeExtractText();
-        else if (currentTool === 'pdf-to-img') await executePdfToImg();
-        else if (currentTool === 'img-to-pdf') await executeImgToPdf();
-        else if (currentTool === 'photo-editor') await executePhotoEditor();
-      } catch (e) {
-        alert('Error: ' + e.message);
-      } finally {
-        btn.disabled = false;
-        document.getElementById('progressContainer').classList.add('hidden');
-      }
-    }
+        const bytes = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({data: bytes}).promise;
+        const { jsPDF } = window.jspdf;
+        let outPdf = null;
 
-    // 1. Compress
-    async function executeCompress() {
-      const file = loadedFiles[0];
-      const q = parseFloat(document.getElementById('optQuality').value);
-      updateProgress(10, 'Reading PDF...');
-      const buf = await file.file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-      const { jsPDF } = window.jspdf;
-      let newDoc = null;
+        for(let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const vp = page.getViewport({scale: 1.2});
+          const cvs = document.createElement('canvas');
+          cvs.width = vp.width; cvs.height = vp.height;
+          await page.render({canvasContext: cvs.getContext('2d'), viewport: vp}).promise;
 
-      for (let i = 1; i <= pdf.numPages; i++) {
-        updateProgress(10 + (i / pdf.numPages) * 80, `Processing page ${i}...`);
-        const page = await pdf.getPage(i);
-        const vp = page.getViewport({ scale: 1.5 });
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = vp.width; canvas.height = vp.height;
-        await page.render({ canvasContext: ctx, viewport: vp }).promise;
-
-        const imgData = canvas.toDataURL('image/jpeg', q);
-        const orient = vp.width > vp.height ? 'l' : 'p';
-        if (i === 1) newDoc = new jsPDF({ orientation: orient, unit: 'px', format: [vp.width, vp.height] });
-        else newDoc.addPage([vp.width, vp.height], orient);
-        newDoc.addImage(imgData, 'JPEG', 0, 0, vp.width, vp.height);
-      }
-      showResult(newDoc.output('blob'), `compressed_${file.name}`, 'PDF compressed successfully.');
-    }
-
-    // 2. Merge
-    async function executeMerge() {
-      updateProgress(20, 'Merging documents...');
-      const merged = await PDFLib.PDFDocument.create();
-      for (let i = 0; i < loadedFiles.length; i++) {
-        const buf = await loadedFiles[i].file.arrayBuffer();
-        const doc = await PDFLib.PDFDocument.load(buf);
-        const pages = await merged.copyPages(doc, doc.getPageIndices());
-        pages.forEach(p => merged.addPage(p));
-      }
-      const bytes = await merged.save();
-      showResult(new Blob([bytes], { type: 'application/pdf' }), 'merged.pdf', 'PDFs merged successfully.');
-    }
-
-    // 3. Split
-    async function executeSplit() {
-      const file = loadedFiles[0];
-      const buf = await file.file.arrayBuffer();
-      const srcDoc = await PDFLib.PDFDocument.load(buf);
-      const rangeStr = document.getElementById('optRange').value;
-      const indices = parsePages(rangeStr, srcDoc.getPageCount());
-
-      const newDoc = await PDFLib.PDFDocument.create();
-      const pages = await newDoc.copyPages(srcDoc, indices);
-      pages.forEach(p => newDoc.addPage(p));
-      const bytes = await newDoc.save();
-      showResult(new Blob([bytes], { type: 'application/pdf' }), `split_${file.name}`, 'PDF split successfully.');
-    }
-
-    // 4. Watermark
-    async function executeWatermark() {
-      const file = loadedFiles[0];
-      const text = document.getElementById('optWatermarkText').value || 'WATERMARK';
-      const opacity = parseFloat(document.getElementById('optOpacity').value) || 0.3;
-
-      const buf = await file.file.arrayBuffer();
-      const pdf = await PDFLib.PDFDocument.load(buf);
-      const font = await pdf.embedFont(PDFLib.StandardFonts.HelveticaBold);
-
-      pdf.getPages().forEach(page => {
-        const { width, height } = page.getSize();
-        page.drawText(text, {
-          x: width / 4,
-          y: height / 2,
-          size: 45,
-          font,
-          color: PDFLib.rgb(0.8, 0.2, 0.2),
-          opacity,
-          rotate: PDFLib.degrees(45)
-        });
-      });
-
-      const bytes = await pdf.save();
-      showResult(new Blob([bytes], { type: 'application/pdf' }), `watermarked_${file.name}`, 'Watermark added.');
-    }
-
-    // 5. Page Number
-    async function executePageNumber() {
-      const file = loadedFiles[0];
-      const pos = document.getElementById('optPosition').value;
-      const buf = await file.file.arrayBuffer();
-      const pdf = await PDFLib.PDFDocument.load(buf);
-      const font = await pdf.embedFont(PDFLib.StandardFonts.Helvetica);
-      const total = pdf.getPageCount();
-
-      pdf.getPages().forEach((page, idx) => {
-        const { width, height } = page.getSize();
-        const text = `Page ${idx + 1} of ${total}`;
-        let x = width / 2 - 25, y = 20;
-
-        if (pos === 'bottom-right') x = width - 80;
-        if (pos === 'top-center') y = height - 30;
-
-        page.drawText(text, { x, y, size: 10, font, color: PDFLib.rgb(0.3, 0.3, 0.3) });
-      });
-
-      const bytes = await pdf.save();
-      showResult(new Blob([bytes], { type: 'application/pdf' }), `numbered_${file.name}`, 'Page numbers added.');
-    }
-
-    // 6. Rotate
-    async function executeRotate() {
-      const file = loadedFiles[0];
-      const angle = parseInt(document.getElementById('optAngle').value, 10);
-      const buf = await file.file.arrayBuffer();
-      const pdf = await PDFLib.PDFDocument.load(buf);
-
-      pdf.getPages().forEach(page => {
-        const current = page.getRotation().angle;
-        page.setRotation(PDFLib.degrees((current + angle) % 360));
-      });
-
-      const bytes = await pdf.save();
-      showResult(new Blob([bytes], { type: 'application/pdf' }), `rotated_${file.name}`, 'Pages rotated successfully.');
-    }
-
-    // 7. Delete Pages
-    async function executeDeletePages() {
-      const file = loadedFiles[0];
-      const deleteStr = document.getElementById('optDeletePages').value;
-      const buf = await file.file.arrayBuffer();
-      const pdf = await PDFLib.PDFDocument.load(buf);
-      const total = pdf.getPageCount();
-
-      const toDelete = new Set(parsePages(deleteStr, total));
-      const keepIndices = Array.from({ length: total }, (_, i) => i).filter(i => !toDelete.has(i));
-
-      const newDoc = await PDFLib.PDFDocument.create();
-      const pages = await newDoc.copyPages(pdf, keepIndices);
-      pages.forEach(p => newDoc.addPage(p));
-
-      const bytes = await newDoc.save();
-      showResult(new Blob([bytes], { type: 'application/pdf' }), `deleted_${file.name}`, 'Pages deleted successfully.');
-    }
-
-    // 8. Protect PDF
-    async function executeProtect() {
-      const file = loadedFiles[0];
-      const pass = document.getElementById('optPassword').value;
-      if (!pass) return alert('Enter a password!');
-
-      const buf = await file.file.arrayBuffer();
-      const pdf = await PDFLib.PDFDocument.load(buf);
-
-      const bytes = await pdf.save({
-        userPassword: pass,
-        ownerPassword: pass,
-        permissions: { printing: 'highResolution', modifying: false }
-      });
-
-      showResult(new Blob([bytes], { type: 'application/pdf' }), `protected_${file.name}`, 'PDF protected with password.');
-    }
-
-    // 9. Extract Text
-    async function executeExtractText() {
-      const file = loadedFiles[0];
-      const buf = await file.file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-      let fullText = '';
-
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        fullText += `--- Page ${i} ---\n` + content.items.map(item => item.str).join(' ') + '\n\n';
-      }
-
-      document.getElementById('extractedTextContainer').classList.remove('hidden');
-      document.getElementById('extractedTextArea').value = fullText;
-      
-      const blob = new Blob([fullText], { type: 'text/plain' });
-      showResult(blob, `${file.name}_text.txt`, 'Text extracted successfully.');
-    }
-
-    // 10. PDF to Image
-    async function executePdfToImg() {
-      const file = loadedFiles[0];
-      const format = document.getElementById('optImgFormat').value;
-      const buf = await file.file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-      
-      const page = await pdf.getPage(1);
-      const vp = page.getViewport({ scale: 2.0 });
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = vp.width; canvas.height = vp.height;
-
-      await page.render({ canvasContext: ctx, viewport: vp }).promise;
-
-      canvas.toBlob(blob => {
-        showResult(blob, `${file.name}_page1.${format === 'image/png' ? 'png' : 'jpg'}`, 'Converted PDF page to image.');
-      }, format);
-    }
-
-    // 11. Image to PDF
-    async function executeImgToPdf() {
-      const pdf = await PDFLib.PDFDocument.create();
-      for (let item of loadedFiles) {
-        const buf = await item.file.arrayBuffer();
-        let img = item.file.type === 'image/png' ? await pdf.embedPng(buf) : await pdf.embedJpg(buf);
-        const page = pdf.addPage([img.width, img.height]);
-        page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
-      }
-      const bytes = await pdf.save();
-      showResult(new Blob([bytes], { type: 'application/pdf' }), 'converted_images.pdf', 'Images converted to PDF.');
-    }
-
-    // 12. Photo Editor
-    async function executePhotoEditor() {
-      const item = loadedFiles[0];
-      updateProgress(30, 'Rendering photo effects...');
-
-      const brightness = document.getElementById('optBrightness').value;
-      const contrast = document.getElementById('optContrast').value;
-      const filter = document.getElementById('optFilter').value;
-      const rotate = parseInt(document.getElementById('optPhotoRotate').value, 10);
-      const flip = document.getElementById('optPhotoFlip').value;
-      const exportFormat = document.getElementById('optExportFormat').value;
-
-      const img = new Image();
-      const url = URL.createObjectURL(item.file);
-
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = url;
-      });
-
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      const isRotatedQuarter = rotate === 90 || rotate === 270;
-      canvas.width = isRotatedQuarter ? img.height : img.width;
-      canvas.height = isRotatedQuarter ? img.width : img.height;
-
-      let filterCss = `brightness(${brightness}%) contrast(${contrast}%)`;
-      if (filter === 'grayscale') filterCss += ' grayscale(100%)';
-      else if (filter === 'sepia') filterCss += ' sepia(100%)';
-      else if (filter === 'invert') filterCss += ' invert(100%)';
-
-      ctx.filter = filterCss;
-
-      ctx.save();
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate((rotate * Math.PI) / 180);
-
-      const scaleX = flip === 'horizontal' ? -1 : 1;
-      const scaleY = flip === 'vertical' ? -1 : 1;
-      ctx.scale(scaleX, scaleY);
-
-      ctx.drawImage(img, -img.width / 2, -img.height / 2);
-      ctx.restore();
-
-      const ext = exportFormat.split('/')[1];
-      canvas.toBlob(blob => {
-        URL.revokeObjectURL(url);
-        showResult(blob, `edited_${item.name.split('.')[0]}.${ext}`, 'Photo edited and processed successfully.');
-      }, exportFormat, 0.9);
-    }
-
-    function parsePages(str, total) {
-      const indices = [];
-      str.split(',').forEach(p => {
-        if (p.includes('-')) {
-          const [s, e] = p.split('-').map(n => parseInt(n.trim(), 10));
-          for (let i = s; i <= e; i++) if (i >= 1 && i <= total) indices.push(i - 1);
-        } else {
-          const n = parseInt(p.trim(), 10);
-          if (n >= 1 && n <= total) indices.push(n - 1);
+          const img = cvs.toDataURL('image/jpeg', q);
+          if(i === 1) outPdf = new jsPDF({unit:'px', format:[vp.width, vp.height]});
+          else outPdf.addPage([vp.width, vp.height]);
+          outPdf.addImage(img, 'JPEG', 0, 0, vp.width, vp.height);
         }
-      });
-      return indices;
+
+        outPdf.save(`compressed_${file.name}`);
+        status.innerText = '✅ Kompresi Selesai!';
+      } catch(e) {
+        console.error(e);
+        status.innerText = '❌ Gagal mengompres. Pastikan koneksi internet stabil untuk pemuatan pustaka.';
+      }
     }
 
-    function showResult(blob, filename, desc) {
-      document.getElementById('resultDescription').textContent = desc;
-      const url = URL.createObjectURL(blob);
-      const btn = document.getElementById('downloadBtn');
-      btn.onclick = () => {
+    /* MERGE */
+    async function processMerge() {
+      const files = document.getElementById('mergeFiles').files;
+      const status = document.getElementById('mergeStatus');
+      if(files.length < 2) return alert('Pilih minimal 2 file!');
+
+      status.innerText = 'Menggabungkan PDF...';
+      try {
+        const merged = await PDFLib.PDFDocument.create();
+        for(let f of files) {
+          const doc = await PDFLib.PDFDocument.load(await f.arrayBuffer());
+          const pages = await merged.copyPages(doc, doc.getPageIndices());
+          pages.forEach(p => merged.addPage(p));
+        }
+        const bytes = await merged.save();
+        const blob = new Blob([bytes], {type: 'application/pdf'});
         const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
+        a.href = URL.createObjectURL(blob);
+        a.download = 'merged.pdf';
         a.click();
-      };
-      document.getElementById('resultModal').classList.remove('hidden');
+        status.innerText = '✅ Penggabungan Berhasil!';
+      } catch(e) {
+        status.innerText = '❌ Gagal menggabungkan PDF.';
+      }
     }
 
-    function closeResultModal() {
-      document.getElementById('resultModal').classList.add('hidden');
-      document.getElementById('extractedTextContainer').classList.add('hidden');
+    /* SPLIT */
+    async function processSplit() {
+      const file = document.getElementById('splitFile').files[0];
+      const range = document.getElementById('splitRange').value;
+      const status = document.getElementById('splitStatus');
+      if(!file || !range) return alert('Pilih file dan isi rentang halaman!');
+
+      status.innerText = 'Memisahkan PDF...';
+      try {
+        const doc = await PDFLib.PDFDocument.load(await file.arrayBuffer());
+        const newDoc = await PDFLib.PDFDocument.create();
+        const parts = range.split('-').map(n => parseInt(n.trim()) - 1);
+        
+        let indices = [];
+        if(parts.length === 2) {
+          for(let i = parts[0]; i <= parts[1]; i++) indices.push(i);
+        } else indices.push(parts[0]);
+
+        const pages = await newDoc.copyPages(doc, indices);
+        pages.forEach(p => newDoc.addPage(p));
+
+        const bytes = await newDoc.save();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([bytes], {type: 'application/pdf'}));
+        a.download = `split_${file.name}`;
+        a.click();
+        status.innerText = '✅ Pemisahan Berhasil!';
+      } catch(e) {
+        status.innerText = '❌ Gagal memisahkan PDF. Cek rentang halaman.';
+      }
+    }
+
+    /* PHOTO EDITOR */
+    let imgObj = new Image();
+    function loadPhoto(e) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        imgObj.onload = () => applyFilters();
+        imgObj.src = event.target.result;
+      }
+      if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
+    }
+
+    function applyFilters() {
+      const cvs = document.getElementById('photoCanvas');
+      const ctx = cvs.getContext('2d');
+      if(!imgObj.src) return;
+
+      cvs.width = imgObj.width;
+      cvs.height = imgObj.height;
+
+      const b = document.getElementById('bright').value;
+      const c = document.getElementById('contrast').value;
+      const f = document.getElementById('filterSelect').value;
+
+      ctx.filter = `brightness(${b}%) contrast(${c}%) ${f !== 'none' ? f : ''}`;
+      ctx.drawImage(imgObj, 0, 0);
+    }
+
+    function downloadPhoto() {
+      const cvs = document.getElementById('photoCanvas');
+      if(!imgObj.src) return alert('Unggah foto terlebih dahulu!');
+      const a = document.createElement('a');
+      a.href = cvs.toDataURL('image/png');
+      a.download = 'edited_photo.png';
+      a.click();
     }
   </script>
 </body>
